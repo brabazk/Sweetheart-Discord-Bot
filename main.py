@@ -21,10 +21,10 @@ import asyncio
 # O código irá procurar uma variável de ambiente chamada DISCORD_TOKEN
 TOKEN = os.environ.get('DISCORD_TOKEN') 
 
-# ----------------------------------------------------
-# >>> ID do canal de Boas-Vindas atualizado
-WELCOME_CHANNEL_ID = 1422958989959893113 
-# ----------------------------------------------------
+# Dicionário para armazenar o ID do canal de boas-vindas para cada servidor
+# Chave: ID do Servidor (Guild ID)
+# Valor: ID do Canal (Channel ID)
+GUILD_CONFIGS = {} 
 
 intents = discord.Intents.default() 
 intents.message_content = True # Necessário para ler o conteúdo das mensagens
@@ -523,40 +523,30 @@ def run_flask():
     # Roda o servidor em 0.0.0.0 para aceitar conexões externas
     app.run(host='0.0.0.0', port=port) 
 
-# Evento de novo membro entrando no servidor
+# Evento: Boas-vindas para novos membros
 @bot.event
 async def on_member_join(member):
-    # Ignora se o membro que entrou é outro bot
-    if member.bot:
-        return
-
-    # Tenta obter o canal de boas-vindas usando o ID definido
-    welcome_channel = bot.get_channel(WELCOME_CHANNEL_ID)
-
-    if welcome_channel:
-        # Cria a mensagem de boas-vindas
-        welcome_message = f"🎉 Olá **{member.mention}**! Bem-vindo(a) ao servidor **{member.guild.name}**! Sinta-se à vontade para explorar e dizer um 'oi' no chat! 🎉"
+    # Verifica se o servidor tem um canal de boas-vindas configurado
+    channel_id = GUILD_CONFIGS.get(member.guild.id) 
+    
+    if channel_id:
+        canal_boas_vindas = bot.get_channel(channel_id)
         
-        # Criar um Embed (Mensagem mais bonita)
-        embed = discord.Embed(
-            title="Boas-vindas!",
-            description=welcome_message,
-            color=0x3a7bd5 # A cor do seu tema
-        )
-        # Define o avatar do usuário como thumbnail
-        embed.set_thumbnail(url=member.avatar.url if member.avatar else member.default_avatar.url)
-        # Adiciona a contagem de membros no rodapé
-        embed.set_footer(text=f"Temos agora {len(member.guild.members)} membros!")
-
-        try:
-            # Envia a mensagem no canal de boas-vindas
-            await welcome_channel.send(embed=embed)
-        except discord.Forbidden:
-            print(f"❌ Erro: Não tenho permissão para enviar mensagens no canal {welcome_channel.name}.")
-        except Exception as e:
-            print(f"❌ Erro ao enviar boas-vindas: {e}")
-    else:
-        print(f"❌ Aviso: O canal de boas-vindas com ID {WELCOME_CHANNEL_ID} não foi encontrado.")
+        if canal_boas_vindas:
+            cor_lavanda = 0x8A2BE2 # Cor Roxo Lavanda
+            
+            embed = discord.Embed(
+                title=f"💖 Boas-Vindas ao {member.guild.name}!",
+                description=f"Olá, {member.mention}! Que bom te ter aqui. Divirta-se no nosso servidor!",
+                color=cor_lavanda
+            )
+            # Adiciona o avatar do novo membro
+            embed.set_thumbnail(url=member.display_avatar.url)
+            
+            # Adiciona uma mensagem de rodapé
+            embed.set_footer(text=f"Você é o(a) {len(member.guild.members)}º membro!")
+            
+            await canal_boas_vindas.send(content=member.mention, embed=embed)
 
 # Comando tradicional (!oi)
 @bot.command() 
@@ -618,6 +608,29 @@ async def slash_help(interaction: discord.Interaction):
     
     embed.set_thumbnail(url=interaction.client.user.display_avatar.url)
     embed.set_footer(text="Use '/' para ver todos os comandos disponíveis.")
+    
+    await interaction.followup.send(embed=embed)
+
+# Comando Slash /set-welcome
+@bot.tree.command(name="set-welcome", description="Define o canal de boas-vindas para novos membros.")
+@app_commands.checks.has_permissions(administrator=True)
+@app_commands.describe(
+    canal="O canal onde as mensagens de boas-vindas serão enviadas."
+)
+async def slash_set_welcome(interaction: discord.Interaction, canal: discord.TextChannel):
+    await interaction.response.defer(ephemeral=True)
+    
+    # Adiciona a configuração ao nosso dicionário global
+    GUILD_CONFIGS[interaction.guild.id] = canal.id
+    
+    embed = discord.Embed(
+        title="🎉 Configuração Salva!",
+        description=f"O canal de boas-vindas foi definido com sucesso para {canal.mention}.",
+        color=0x2ecc71 # Verde - Sucesso
+    )
+    
+    # NOTE: Em um projeto grande, você usaria um banco de dados aqui (SQLite ou PostgreSQL) 
+    # para persistir os dados após o bot reiniciar. Para este projeto, o dicionário basta.
     
     await interaction.followup.send(embed=embed)
 
