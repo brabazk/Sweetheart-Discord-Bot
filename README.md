@@ -12,7 +12,7 @@ O bot usa apenas **Comandos Slash (/)** e é hospedado gratuitamente 24/7.
 
 Convide o Sweetheart para o seu servidor e descubra conexões **inevitáveis** e ferramentas de moderação intuitivas.
 
-➡️ **[Convite do Bot](Chttps://discord.com/oauth2/authorize?client_id=1422667349814808596&permissions=8&integration_type=0&scope=bot)**
+➡️ **[Convite do Bot](https://discord.com/oauth2/authorize?client_id=1422667349814808596&permissions=8&integration_type=0&scope=bot)**
 ➡️ **[Servidor Oficial: Central Sweetheart](https://discord.gg/SXubCZRYfz)**
 
 ---
