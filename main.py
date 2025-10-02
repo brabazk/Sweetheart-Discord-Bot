@@ -18,7 +18,8 @@ import threading
 import hashlib
 import asyncio
 
-TOKEN = 'MTQyMjY2NzM0OTgxNDgwODU5Ng.GlmRRy.oENOfTKWsU4m7RpDdGz1Pnn29i_3idb6pDodZU'
+# O código irá procurar uma variável de ambiente chamada DISCORD_TOKEN
+TOKEN = os.environ.get('DISCORD_TOKEN') 
 
 # ----------------------------------------------------
 # >>> ID do canal de Boas-Vindas atualizado
