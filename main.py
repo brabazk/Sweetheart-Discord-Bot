@@ -566,6 +566,61 @@ async def oi(ctx, membro: discord.Member = None):
         else:
                 await ctx.send('Olá! Eu sou o bot da sasa.') 
 
+# Comando Slash /help
+@bot.tree.command(name="help", description="Mostra a lista de comandos e funcionalidades do Sweetheart.")
+async def slash_help(interaction: discord.Interaction):
+    await interaction.response.defer(thinking=True)
+    
+    # Definindo a cor e o ícone do bot para o Embed
+    cor_lavanda = 0x8A2BE2  # Roxo Lavanda
+    
+    embed = discord.Embed(
+        title="💖 Central Sweetheart | Ajuda Inevitável",
+        description="Eu sou a sua ferramenta de gerenciamento e conexão. Use os comandos abaixo para interagir e moderar!",
+        color=cor_lavanda
+    )
+    
+    # --- Interação e Magia ---
+    embed.add_field(
+        name="✨ Interação e Magia",
+        value=(
+            "**/ship:** Calcule o destino e afinidade de dois usuários.\n"
+            "**/genio:** Resposta mística para qualquer pergunta (sim ou não).\n"
+            "**/abracar:** Dê um abraço aconchegante em alguém.\n"
+            "**/bater:** Dê um tapa em alguém."
+        ),
+        inline=False
+    )
+    
+    # --- Utilidade e Informação ---
+    embed.add_field(
+        name="🛠️ Utilidades (Em Breve)",
+        value=(
+            "**/dados:** Role dados (D6, D20, etc.) e descubra sua sorte.\n"
+            "**/userinfo:** Veja informações de um membro (em desenvolvimento).\n"
+            "**/tempo:** Veja o clima em qualquer cidade (em desenvolvimento)."
+        ),
+        inline=False
+    )
+    
+    # --- Moderação e Gerenciamento ---
+    embed.add_field(
+        name="🛡️ Moderação Essencial",
+        value=(
+            "**/kick [membro]:** Expulsa temporariamente um membro.\n"
+            "**/ban [membro]:** Bane permanentemente um membro.\n"
+            "**/lock:** Tranca o canal atual para todos.\n"
+            "**/unlock:** Destranca o canal atual.\n"
+            "**/role [membro, cargo]:** *[Em Breve]* Gerencia cargos (Adicionar/Remover)."
+        ),
+        inline=False
+    )
+    
+    embed.set_thumbnail(url=interaction.client.user.display_avatar.url)
+    embed.set_footer(text="Use '/' para ver todos os comandos disponíveis.")
+    
+    await interaction.followup.send(embed=embed)
+
 # Slash command /oi
 @bot.tree.command(name="oi", description="Diga oi para alguém!")
 @app_commands.describe(
