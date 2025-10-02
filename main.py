@@ -1068,6 +1068,115 @@ async def slash_bater(interaction: discord.Interaction, membro: discord.Member):
     
     await interaction.followup.send(embed=embed)
 
+# Comando Slash /kick
+@bot.tree.command(name="kick", description="Remove (expulsa) um membro do servidor.")
+@app_commands.checks.has_permissions(kick_members=True)
+@app_commands.describe(
+    membro="O membro a ser expulso.",
+    motivo="O motivo da expulsão (aparecerá no log)."
+)
+async def slash_kick(interaction: discord.Interaction, membro: discord.Member, motivo: str = "Sem motivo especificado."):
+    await interaction.response.defer(ephemeral=True) # Responde de forma privada
+
+    if membro.top_role >= interaction.user.top_role:
+        await interaction.followup.send(f"❌ Você não pode expulsar **{membro.display_name}**. O cargo dele é igual ou superior ao seu.")
+        return
+
+    try:
+        await membro.kick(reason=motivo)
+        
+        embed = discord.Embed(
+            title="👢 Membro Expulso!",
+            description=f"**Usuário:** {membro.mention}\n**Moderador:** {interaction.user.mention}\n**Motivo:** {motivo}",
+            color=0xf1c40f # Amarelo - Aviso
+        )
+        await interaction.followup.send(embed=embed)
+    except Exception as e:
+        await interaction.followup.send(f"❌ Ocorreu um erro ao tentar expulsar o membro: {e}")
+
+# Comando Slash /ban
+@bot.tree.command(name="ban", description="Bane (proíbe permanentemente) um membro do servidor.")
+@app_commands.checks.has_permissions(ban_members=True)
+@app_commands.describe(
+    membro="O membro a ser banido.",
+    motivo="O motivo do banimento (aparecerá no log)."
+)
+async def slash_ban(interaction: discord.Interaction, membro: discord.Member, motivo: str = "Sem motivo especificado."):
+    await interaction.response.defer(ephemeral=True) # Responde de forma privada
+
+    if membro.top_role >= interaction.user.top_role:
+        await interaction.followup.send(f"❌ Você não pode banir **{membro.display_name}**. O cargo dele é igual ou superior ao seu.")
+        return
+
+    try:
+        await membro.ban(reason=motivo)
+        
+        embed = discord.Embed(
+            title="🔨 Membro Banido!",
+            description=f"**Usuário:** {membro.mention}\n**Moderador:** {interaction.user.mention}\n**Motivo:** {motivo}",
+            color=0xe74c3c # Vermelho - Perigo
+        )
+        await interaction.followup.send(embed=embed)
+    except Exception as e:
+        await interaction.followup.send(f"❌ Ocorreu um erro ao tentar banir o membro: {e}")
+
+# Comando Slash /lock e /unlock
+@bot.tree.command(name="lock", description="Tranca o canal atual, impedindo que membros enviem mensagens.")
+@app_commands.checks.has_permissions(manage_channels=True)
+async def slash_lock(interaction: discord.Interaction):
+    await interaction.response.defer(ephemeral=True) # Responde de forma privada
+    
+    canal = interaction.channel
+    # Encontra a permissão padrão (@everyone)
+    permissao_everyone = canal.overwrites_for(interaction.guild.default_role)
+
+    if permissao_everyone.send_messages is False:
+        await interaction.followup.send("❌ O canal já está trancado!")
+        return
+
+    # Define a permissão de envio de mensagens para FALSO para @everyone
+    permissao_everyone.send_messages = False
+    
+    try:
+        await canal.set_permissions(interaction.guild.default_role, overwrite=permissao_everyone)
+        
+        embed = discord.Embed(
+            title="🔒 Canal Trancado!",
+            description=f"Canal **{canal.mention}** foi trancado por {interaction.user.mention}.",
+            color=0x2ecc71 # Verde - Sucesso
+        )
+        await interaction.followup.send(embed=embed)
+    except Exception as e:
+        await interaction.followup.send(f"❌ Erro ao trancar o canal: {e}")
+
+
+@bot.tree.command(name="unlock", description="Destranca o canal atual, permitindo o envio de mensagens.")
+@app_commands.checks.has_permissions(manage_channels=True)
+async def slash_unlock(interaction: discord.Interaction):
+    await interaction.response.defer(ephemeral=True) # Responde de forma privada
+    
+    canal = interaction.channel
+    permissao_everyone = canal.overwrites_for(interaction.guild.default_role)
+    
+    if permissao_everyone.send_messages is True:
+        await interaction.followup.send("❌ O canal já está destrancado!")
+        return
+
+    # Define a permissão de envio de mensagens para VERDADEIRO para @everyone
+    permissao_everyone.send_messages = True
+    
+    try:
+        await canal.set_permissions(interaction.guild.default_role, overwrite=permissao_everyone)
+        
+        embed = discord.Embed(
+            title="🔓 Canal Destrancado!",
+            description=f"Canal **{canal.mention}** foi destrancado por {interaction.user.mention}.",
+            color=0x3498db # Azul - Info
+        )
+        await interaction.followup.send(embed=embed)
+    except Exception as e:
+        await interaction.followup.send(f"❌ Erro ao destrancar o canal: {e}")
+
 # Sincroniza os comandos de barra ao iniciar
 @bot.event
 async def on_ready():
