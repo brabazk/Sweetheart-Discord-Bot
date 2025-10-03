@@ -1,6 +1,6 @@
 # 💖 Sweetheart Bot | Gerenciamento e Magia
 
-![Banner do Servidor Oficial](https://ibb.co/prsvfmMz)
+![Banner do Servidor Oficial](https://cdn.discordapp.com/attachments/1423685166081249332/1423685259622350868/bannerreadme-botsasa.png?ex=68e135b8&is=68dfe438&hm=398c7bed1a44dc1ce558917d9283239ab359971ebef025d31aaa6efcc4f5df4a&)
 
 Sweetheart é um bot Discord multifuncional em português, focado em **interações sociais, diversão mística** e **gerenciamento essencial** de servidor. Desenvolvido no Brasil com amor e código limpo.
 
